@@ -3,8 +3,8 @@
 #include <WebSocketsServer.h>
 
 // Credenciales de la red Wi-Fi que creará el Dron
-const char* ssid = "Dron_ESP32";
-const char* password = "password123"; // Mínimo 8 caracteres
+const char* ssid = "NERV-Protocol";
+const char* password = "sonotakus"; // Mínimo 8 caracteres
 
 // Servidor Web en el puerto 80 y WebSockets en el puerto 81
 WebServer server(80);
