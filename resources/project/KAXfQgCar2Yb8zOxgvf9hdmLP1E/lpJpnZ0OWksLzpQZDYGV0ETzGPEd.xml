@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Info File="config.m" GroupUUID="default" Icon="" Name="config" Type="StartUp" Visible="0">
-    <Extension Name="StartUpPrev" Value="HEAD"/>
-</Info>
