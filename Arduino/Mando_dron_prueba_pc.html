@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Evita que la pantalla haga zoom accidentalmente al usar los joysticks -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GCS Dron ESP32</title>
+    <style>
+        body {
+            margin: 0; padding: 0; background-color: #222; color: white;
+            font-family: Arial, sans-serif; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        #header { text-align: center; padding: 10px; background: #333; }
+        #joystick-container {
+            display: flex; justify-content: space-between; align-items: center;
+            flex: 1; padding: 20px;
+        }
+        .joystick-zone {
+            width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%; position: relative; touch-action: none; border: 2px solid #555;
+        }
+        .knob {
+            width: 50px; height: 50px; background: #00ff88; border-radius: 50%;
+            position: absolute; top: 50px; left: 50px; /* Centrado inicial */
+            pointer-events: none;
+        }
+        /* Color distinto para el joystick de altura/yaw */
+        #knob-left { background: #ff4444; } 
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        Estado: <span id="status" style="color: red;">Desconectado</span> | 
+        Datos: <span id="data-out">T:0 Y:0 P:0 R:0</span>
+    </div>
+
+    <div id="joystick-container">
+        <!-- Joystick Izquierdo: Altura (Throttle) y Guiñada (Yaw) -->
+        <div class="joystick-zone" id="zone-left">
+            <div class="knob" id="knob-left"></div>
+        </div>
+        <!-- Joystick Derecho: Cabeceo (Pitch) y Alabeo (Roll) -->
+        <div class="joystick-zone" id="zone-right">
+            <div class="knob" id="knob-right"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables de control (T=Throttle/Altura, Y=Yaw, P=Pitch, R=Roll)
+        let controlData = { T: 0, Y: 0, P: 0, R: 0 };
+        
+        // 1. INICIAR CONEXIÓN WEBSOCKET HACIA EL ESP32
+        // Asumimos que el ESP32 tendrá la IP 192.168.4.1 (por defecto en modo AP)
+        let gateway = `ws://${window.location.hostname}/ws`;
+        let websocket = new WebSocket(gateway);
+
+        websocket.onopen = () => { document.getElementById('status').style.color = "lime"; document.getElementById('status').innerText = "Conectado"; };
+        websocket.onclose = () => { document.getElementById('status').style.color = "red"; document.getElementById('status').innerText = "Desconectado"; };
+
+        // 2. LÓGICA DE LOS JOYSTICKS TÁCTILES
+        function setupJoystick(zoneId, knobId, isLeft) {
+            const zone = document.getElementById(zoneId);
+            const knob = document.getElementById(knobId);
+            const center = 75; // Mitad de 150px (tamaño de la zona)
+            
+            zone.addEventListener('touchmove', function(e) {
+                e.preventDefault(); // Evita scroll
+                let touch = e.targetTouches[0];
+                let rect = zone.getBoundingClientRect();
+                
+                // Calcular posición relativa al centro del joystick
+                let x = touch.clientX - rect.left - center;
+                let y = touch.clientY - rect.top - center;
+
+                // Limitar el movimiento del círculo dentro de la zona
+                let distance = Math.sqrt(x*x + y*y);
+                if (distance > center) {
+                    x = x * (center / distance);
+                    y = y * (center / distance);
+                }
+
+                // Mover visualmente el botón
+                knob.style.transform = `translate(${x}px, ${y}px)`;
+
+                // Mapear de píxeles (-75 a 75) a un valor de control de dron (-100 a 100)
+                let valX = Math.round((x / center) * 100);
+                let valY = Math.round((-y / center) * 100); // Y invertido para que arriba sea positivo
+
+                if (isLeft) {
+                    controlData.Y = valX; // Yaw
+                    controlData.T = valY; // Altura objetivo (Throttle)
+                } else {
+                    controlData.R = valX; // Roll
+                    controlData.P = valY; // Pitch
+                }
+            });
+
+            // Al soltar el dedo, devolver al centro (excepto la altura si no queremos)
+            zone.addEventListener('touchend', function(e) {
+                knob.style.transform = `translate(0px, 0px)`;
+                if(isLeft) {
+                    controlData.Y = 0;
+                    // OJO: En drones reales el acelerador no se autocentra, pero como usaremos
+                    // un controlador de ALTURA (Altitude Hold), 0 significará "mantén la altura actual".
+                    controlData.T = 0; 
+                } else {
+                    controlData.R = 0;
+                    controlData.P = 0;
+                }
+            });
+        }
+
+        setupJoystick('zone-left', 'knob-left', true);
+        setupJoystick('zone-right', 'knob-right', false);
+
+        // 3. ENVIAR DATOS AL ESP32 A 20Hz (cada 50ms)
+        setInterval(() => {
+            // Preparamos el paquete de texto
+            let payload = `T:${controlData.T} Y:${controlData.Y} P:${controlData.P} R:${controlData.R}`;
+            
+            // ACTUALIZACIÓN VISUAL: Mostramos los datos en pantalla SIEMPRE (útil para pruebas)
+            document.getElementById('data-out').innerText = payload;
+
+            // TRANSMISIÓN: Solo enviamos por red si el dron está conectado
+            if (websocket.readyState === WebSocket.OPEN) {
+                websocket.send(payload);
+            }
+        }, 50);
+    </script>
+</body>
+</html>
