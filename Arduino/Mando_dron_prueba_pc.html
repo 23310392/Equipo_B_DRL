@@ -52,7 +52,7 @@
         let controlData = { T: 0, Y: 0, P: 0, R: 0 };
         
         // 1. INICIAR CONEXIÓN WEBSOCKET HACIA EL ESP32
-        // Asumimos que el ESP32 tendrá la IP 192.168.4.1 (por defecto en modo AP)
+        // Asumimos que el ESP32 tendrá la IP 192.168.4.1 
         let gateway = `ws://${window.location.hostname}/ws`;
         let websocket = new WebSocket(gateway);
 
