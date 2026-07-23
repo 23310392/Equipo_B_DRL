@@ -2,8 +2,6 @@
 #include <WebServer.h>
 #include <WebSocketsServer.h>
 #include <Wire.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
 
 // --- CREDENCIALES WI-FI ---
 const char* ssid = "NERV-Protocol";
@@ -11,7 +9,10 @@ const char* password = "sonotakus";
 
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
-Adafruit_MPU6050 mpu;
+
+// --- DIRECCIÓN Y VARIABLES DEL MPU-6050 ---
+const int MPU_ADDR = 0x68; 
+int16_t AcX, AcY, AcZ, GyX, GyY, GyZ, Tmp;
 
 // --- ASIGNACIÓN DE MOTORES (QUAD X) ---
 const int motor1 = 2; // Trasero Derecho (CW)
@@ -131,7 +132,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
   if (type == WStype_TEXT) {
     if (strncmp((const char *)payload, "CMD:FLIGHT", 10) == 0) {
-      // Solo permite despegar si el sensor está funcionando
       if (estadoDron == SUELO && mpuConectado) estadoDron = DESPEGANDO;
       else if (estadoDron == VOLANDO || estadoDron == DESPEGANDO) estadoDron = ATERRIZANDO;
       return; 
@@ -148,7 +148,7 @@ void setup() {
   pinMode(motor1, OUTPUT); pinMode(motor2, OUTPUT); 
   pinMode(motor3, OUTPUT); pinMode(motor4, OUTPUT);
 
-  // 1. INICIAR COMUNICACIONES PRIMERO (Para no perder el Wi-Fi)
+  // 1. INICIAR WI-FI PRIMERO
   Serial.println("Iniciando Dron AP...");
   WiFi.softAP(ssid, password);
   server.on("/", []() { server.send(200, "text/html", index_html); });
@@ -157,17 +157,29 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
   Serial.println("Wi-Fi y Servidor Web iniciados correctamente.");
 
-  // 2. INICIAR SENSOR MPU6050 DESPUÉS
-  Wire.begin(); 
-  if (!mpu.begin()) {
-    Serial.println("¡ADVERTENCIA! MPU6050 no detectado. Revisa las soldaduras.");
+  // 2. INICIAR SENSOR MPU6050 (I2C Raw)
+  Wire.begin();
+  Wire.beginTransmission(MPU_ADDR);
+  byte error = Wire.endTransmission(); // Verifica si el dispositivo responde
+
+  if (error != 0) {
+    Serial.println("¡ADVERTENCIA! MPU6050 no responde en I2C.");
     Serial.println("El Wi-Fi funciona, pero el vuelo ha sido bloqueado por seguridad.");
     mpuConectado = false;
   } else {
-    Serial.println("Sensor MPU6050 conectado y listo.");
-    mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-    mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
+    // Despertar MPU-6050
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x6B); // PWR_MGMT_1
+    Wire.write(0);    // 0 = Despertar
+    Wire.endTransmission(true);
+
+    // Configurar Filtro Paso Bajo (DLPF) a 42Hz para mitigar vibración de motores
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x1A); // CONFIG
+    Wire.write(0x03); // Valor 3 = 42Hz
+    Wire.endTransmission(true);
+
+    Serial.println("Sensor MPU6050 inicializado correctamente.");
     mpuConectado = true;
   }
   
@@ -178,7 +190,6 @@ void loop() {
   server.handleClient();
   webSocket.loop();
 
-  // Si no hay sensor, bloqueamos los motores y saltamos el resto del loop
   if (!mpuConectado) {
     analogWrite(motor1, 0); analogWrite(motor2, 0);
     analogWrite(motor3, 0); analogWrite(motor4, 0);
@@ -187,25 +198,40 @@ void loop() {
   }
 
   unsigned long tiempoActual = micros();
-  dt = (tiempoActual - tiempoAnterior) / 1000000.0; // Tiempo en segundos
+  dt = (tiempoActual - tiempoAnterior) / 1000000.0; // Segundos
 
-  // Ejecutamos el lazo de control PID a alta velocidad (aprox 100Hz = cada 10ms)
+  // Lazo de control a ~100Hz
   if (dt >= 0.01) {
     tiempoAnterior = tiempoActual;
 
-    // 1. LEER SENSOR
-    sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);
+    // 1. LEER SENSOR RAW I2C
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x3B);
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_ADDR, 14, true);
 
-    // 2. CALCULAR ÁNGULOS (Filtro Complementario)
-    float accPitch = atan2(a.acceleration.y, a.acceleration.z) * 180 / PI;
-    float accRoll  = atan2(-a.acceleration.x, sqrt(a.acceleration.y * a.acceleration.y + a.acceleration.z * a.acceleration.z)) * 180 / PI;
+    AcX = Wire.read() << 8 | Wire.read();
+    AcY = Wire.read() << 8 | Wire.read();
+    AcZ = Wire.read() << 8 | Wire.read();
+    Tmp = Wire.read() << 8 | Wire.read();
+    GyX = Wire.read() << 8 | Wire.read();
+    GyY = Wire.read() << 8 | Wire.read();
+    GyZ = Wire.read() << 8 | Wire.read();
 
-    pitchReal = 0.98 * (pitchReal + (g.gyro.x * 180/PI) * dt) + 0.02 * accPitch;
-    rollReal  = 0.98 * (rollReal  + (g.gyro.y * 180/PI) * dt) + 0.02 * accRoll;
-    float yawRate = g.gyro.z * 180/PI; 
+    // 2. CALCULAR ÁNGULOS
+    // Se usa (long) para evitar desbordamiento matemático al multiplicar enteros de 16 bits
+    float accPitch = atan2(AcY, AcZ) * 180 / PI;
+    float accRoll  = atan2(-AcX, sqrt((long)AcY * AcY + (long)AcZ * AcZ)) * 180 / PI;
 
-    // 3. MÁQUINA DE ESTADOS DE POTENCIA BÁSICA
+    // Escalar giroscopio a grados por segundo (Rango por defecto de +/- 250 dps = 131.0 LSB/dps)
+    float gyroXrate = GyX / 131.0;
+    float gyroYrate = GyY / 131.0;
+    float yawRate   = GyZ / 131.0;
+
+    pitchReal = 0.98 * (pitchReal + gyroXrate * dt) + 0.02 * accPitch;
+    rollReal  = 0.98 * (rollReal  + gyroYrate * dt) + 0.02 * accRoll;
+
+    // 3. MÁQUINA DE ESTADOS Y CONTROL PID
     if (estadoDron == DESPEGANDO) {
       pwmBase += VELOCIDAD_RAMPA;
       if (pwmBase >= PWM_HOVER) { pwmBase = PWM_HOVER; estadoDron = VOLANDO; }
@@ -216,9 +242,7 @@ void loop() {
 
     int pwmFinalM1 = 0, pwmFinalM2 = 0, pwmFinalM3 = 0, pwmFinalM4 = 0;
 
-    // Solo calculamos PID y activamos motores si no estamos apagados en el suelo
     if (estadoDron != SUELO) {
-      
       pitchTarget = map(pitchManual, -100, 100, -20, 20);
       rollTarget  = map(rollManual, -100, 100, -20, 20);
       yawTarget   = map(yawManual, -100, 100, -45, 45); 
@@ -248,7 +272,7 @@ void loop() {
       float pidYaw = (Kp_yaw * errorYaw) + (Ki_yaw * sumErrorYaw) + (Kd_yaw * dErrorYaw);
       errorYawPrev = errorYaw;
 
-      // 4. MEZCLA DE MOTORES CON SALIDAS PID
+      // 4. MEZCLA DE MOTORES (Quad X)
       int base = pwmBase + t_pwm;
 
       pwmFinalM1 = base + pidPitch - pidRoll - pidYaw; // Trasero Derecho
