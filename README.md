@@ -39,20 +39,100 @@ Este diagrama implementa un **sistema de control en cascada** para la estabiliza
 La transformación del E88 a un dron FPV funcional requirió una actualización completa de la electrónica y la implementación de protocolos de comunicación robustos.
 
 ### Componentes Principales
-*   **Controladora de Vuelo (FC):** [Ingresar modelo de FC]
-*   **Variadores de Velocidad (ESC):** [Ingresar modelo y amperaje de ESCs]
-*   **Motores:** [Ingresar tamaño y KV, ej. 1103 8000KV]
-*   **Sistema FPV:** Cámara [Modelo] y VTX de [Potencia, ej. 200mW].
-*   **Receptor (RX):** [Modelo del receptor de radio]
+*   **Controladora de Vuelo (FC):** [Sensor MPU6050]
+*   **Variadores de Velocidad (ESC):** [ESCs 30A]
+*   **Motores:** [2212 1000KV]
+*   **Receptor :** [Arduino nano ESP32]
 
 ### Protocolos de Comunicación Utilizados
-*   **Receptor a Controladora (RX -> FC):** Se utiliza el protocolo **[Ej. CRSF / SBUS / IBUS]** vía UART, lo que garantiza una latencia ultra baja para el control manual del dron.
-*   **Controladora a ESCs:** La comunicación con los motores se realiza mediante el protocolo digital **[Ej. DSHOT300 / DSHOT600]**, eliminando la necesidad de calibración analógica y ofreciendo mayor precisión en las RPM.
-*   **Telemetría y Configuración de VTX:** Se implementó el protocolo **[Ej. SmartAudio / IRC Tramp]** para poder cambiar canales y potencia de transmisión de video directamente desde el control remoto (OSD).
-*   **Sensores Internos (Giroscopio/Acelerómetro):** Comunicación interna vía **SPI / I2C** para una lectura de datos a alta frecuencia (ej. 8kHz).
+*   **Receptor a Controladora (Arduino nano ESP32 -> dispositivo conectado por wifi):** El protocolo más común para conectar un Arduino Nano ESP32 a un dispositivo vía Wi-Fi y controlar un dron es el uso de comunicación basada en UDP/TCP sobre la red inalámbrica, donde el ESP32 actúa como punto de acceso o cliente y recibe comandos de control (pitch, roll, yaw, throttle) enviados desde un smartphone o computadora. Esto permite transmitir órdenes en tiempo real con baja latencia.
+*   **Controladora(Arduino nano ESP32) a ESCs:** La comunicación entre el Arduino Nano ESP32 y los ESCs de 30A se realiza de forma simple y eficiente mediante PWM, permitiendo controlar la velocidad de los motores y, con ello, la estabilidad y maniobrabilidad del dron.
+*   **Sensores Internos (Acelerómetro):**
+  *El **MPU6050** integra un acelerómetro de 3 ejes que mide las aceleraciones lineales en tiempo real.
+  * Permite detectar cambios en la posición y movimiento del dron, fundamentales para calcular la orientación (roll, pitch).
+  * Su comunicación mediante protocolo **I²C** (líneas SDA y SCL) simplifica la conexión con el **Arduino Nano ESP32**.
+  * El acelerómetro trabaja junto con el giroscopio para reducir errores de deriva y mejorar la precisión de los cálculos de estabilidad.
+
+
+
+## Reporte de materiales y justificación
+
+## Sensor MPU6050
+### Descripción
+El MPU6050 es un módulo que integra un acelerómetro de 3 ejes y un giroscopio de 3 ejes, ofreciendo un sistema de medición de 6 grados de libertad (6DOF). Se utiliza ampliamente en proyectos de drones por su capacidad de medir aceleraciones lineales y velocidades angulares en tiempo real.
+
+### Justificación de uso en el dron
+- Permite obtener datos de orientación y movimiento (roll, pitch, yaw).
+- Mejora la estabilidad del vuelo, corrigiendo oscilaciones y vibraciones.
+- Facilita la implementación de controladores PID, ajustando la velocidad de los motores para mantener equilibrio.
+- Incluye un Digital Motion Processor (DMP) que procesa cálculos de orientación dentro del chip, reduciendo la carga del microcontrolador.
+- Se comunica mediante I²C, lo que simplifica la integración con placas como Arduino o ESP32.
+
+### Beneficios en la mejora del dron
+- Vuelo más estable y controlado.
+- Maniobras más suaves y precisas.
+- Reducción de errores por deriva del giroscopio mediante fusión de datos con el acelerómetro.
+- Flexibilidad para integrarse con otros sensores (GPS, barómetro, magnetómetro).
 
 ---
 
+## Placa de desarrollo Arduino Nano ESP32
+### Descripción
+El Arduino Nano ESP32 es una placa compacta que combina la facilidad de uso del ecosistema Arduino con la potencia del microcontrolador ESP32. Ofrece conectividad inalámbrica integrada (Wi-Fi y Bluetooth), múltiples entradas/salidas digitales y analógicas, y capacidad de procesamiento superior en comparación con placas tradicionales como el Arduino Nano clásico.
+
+### Justificación de uso en el dron
+- Actúa como unidad de control principal, gestionando la lectura de sensores y el envío de señales a los motores.
+- Su procesador dual-core permite ejecutar algoritmos de control en tiempo real, como filtros de fusión de datos y controladores PID.
+- La conectividad Wi-Fi/Bluetooth facilita la comunicación remota para telemetría, control desde aplicaciones móviles o transmisión de datos.
+- Compatible con librerías y entornos de programación de Arduino, lo que simplifica el desarrollo y la integración con otros módulos.
+- Su tamaño reducido y bajo consumo energético lo hacen ideal para aplicaciones en drones ligeros.
+
+### Beneficios en la mejora del dron
+- Mayor capacidad de procesamiento para cálculos de estabilidad y navegación.
+- Posibilidad de implementar funciones avanzadas como control remoto inalámbrico o envío de datos en tiempo real.
+- Integración sencilla con sensores como el MPU6050, GPS y módulos de comunicación.
+- Optimización del espacio y peso gracias a su formato compacto.
+- Es un componente de bajo costo y alta disponibilidad, ideal para proyectos académicos y prototipos.
+
+---
+
+## Controlador de velocidad electrónico (ESC) 30A
+### Descripción
+El ESC de 30 amperios (30A) es un controlador de velocidad electrónico diseñado para regular la potencia suministrada a los motores brushless del dron. Convierte la señal de control proveniente del microcontrolador (Arduino Nano ESP32) en pulsos eléctricos adecuados para ajustar la velocidad y dirección de los motores.
+
+### Justificación de uso en el dron
+- Permite un control preciso de la velocidad de los motores, esencial para la estabilidad y maniobrabilidad del dron.
+- Soporta hasta 30 amperios de corriente, adecuado para motores de tamaño medio utilizados en drones académicos o recreativos.
+- Incluye funciones de protección contra sobrecorriente y sobrecalentamiento, aumentando la seguridad del sistema.
+- Compatible con señales PWM estándar, facilitando la integración con placas de control como el Arduino Nano ESP32.
+- Su tamaño compacto y peso ligero lo hacen ideal para aplicaciones aéreas.
+
+### Beneficios en la mejora del dron
+- Mejora la respuesta dinámica del dron al ajustar rápidamente la velocidad de los motores.
+- Contribuye a un vuelo más estable y seguro, evitando daños por sobrecarga eléctrica.
+- Permite implementar algoritmos de control avanzados (PID) para mantener equilibrio y realizar maniobras suaves.
+- Asegura una distribución eficiente de energía, optimizando el rendimiento de la batería.
+
+---
+
+## Motor Brushless 2212 1000KV
+### Descripción
+El motor brushless 2212 1000KV es un motor eléctrico sin escobillas diseñado para aplicaciones aéreas como drones y cuadricópteros. El valor 1000KV indica que el motor gira aproximadamente a 1000 revoluciones por minuto (RPM) por cada voltio aplicado, lo que lo hace adecuado para un equilibrio entre potencia y eficiencia.
+
+### Justificación de uso en el dron
+- Proporciona la fuerza de empuje necesaria para levantar y mantener el dron en vuelo.
+- Su diseño sin escobillas (brushless) ofrece mayor durabilidad, menor mantenimiento y mejor eficiencia energética en comparación con motores con escobillas.
+- El rango de 1000KV es ideal para drones de tamaño medio, ya que permite un buen control de velocidad y estabilidad sin sacrificar autonomía.
+- Compatible con controladores ESC de 30A, asegurando una integración confiable en el sistema de propulsión.
+- Su tamaño compacto y peso ligero lo hacen adecuado para estructuras de drones académicos y recreativos.
+
+### Beneficios en la mejora del dron
+- Vuelo más estable y eficiente, gracias a su respuesta rápida y precisa.
+- Mayor tiempo de vuelo, al optimizar el consumo de energía de la batería.
+- Capacidad de carga adecuada, permitiendo transportar sensores y componentes adicionales sin comprometer el rendimiento.
+- Durabilidad y confiabilidad.
+
+---
 ## 💻 Programación y Lógica de Vuelo (Custom Firmware)
 
 El "cerebro" de este dron no utiliza un firmware comercial prefabricado, sino que funciona con un controlador de vuelo personalizado programado desde cero para el microcontrolador ESP32.
