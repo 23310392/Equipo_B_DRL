@@ -22,7 +22,7 @@ Al partir del modelo E88, se identificaron varias áreas de mejora estructural. 
 Para comprender el comportamiento dinámico del dron y predecir su respuesta a los comandos de control, se desarrolló un modelo matemático en MATLAB. A continuación se presenta la evidencia fotográfica y gráfica de las ondas de comportamiento de nuestro modelo (por ejemplo, respuesta al escalón, ajuste de PIDs teórico, estabilización de altitud).
 
 ### Diagrama de control
-![](Modelo dron NERV/Diagrama de control.png)
+<img width="962" height="712" alt="Diagrama de control" src="https://github.com/user-attachments/assets/84e2185d-0bf3-4349-8312-b6d280ddee65" />
 
 Este diagrama implementa un **sistema de control en cascada** para la estabilización y seguimiento de trayectoria de un modelo no lineal de 6 grados de libertad (`Modelo_NERV`) en Simulink.
 
