@@ -33,23 +33,24 @@ Este diagrama implementa un **sistema de control en cascada** para la estabiliza
 * **Visualización:** Monitoreo en tiempo real de la posición espacial y el comportamiento de los ángulos de Euler mediante bloques *Scope*.
 
 ### Gráficas de movimiento (X, Y, Z, Roll, Pitch y Yaw)
-<img width="2184" height="1166" alt="Gráfica de movimiento en X" src="https://github.com/user-attachments/assets/ab90fce3-ff6e-4937-9438-a0f3afded2bc" />
 Movimiento en X: Representa el desplazamiento lineal en el eje X. Se observa una transición limpia y rápida que alcanza la posición objetivo de 2m sin sobreimpulsos agresivos.
+<img width="2184" height="1166" alt="Gráfica de movimiento en X" src="https://github.com/user-attachments/assets/ab90fce3-ff6e-4937-9438-a0f3afded2bc" />
 
-<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/ea59f573-c938-4c1e-aef7-9efca886711a" />
+
 Movimiento en Y: Muestra la respuesta en el eje Y alcanzando de forma estable y asintótica el valor de referencia configurado en 1m.
+<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/ea59f573-c938-4c1e-aef7-9efca886711a" />
 
-<img width="2184" height="1166" alt="Gráfica de movimiento en Z" src="https://github.com/user-attachments/assets/11f11cfb-4df9-4a46-87cd-6ca594511471" />
 Movimiento en Z (Altura): Muestra la respuesta escalón de la altitud del cuadricóptero. Presenta un ligero sobreimpulso controlado durante los primeros segundos antes de estabilizarse suavemente en la referencia deseada de 2m.
+<img width="2184" height="1166" alt="Gráfica de movimiento en Z" src="https://github.com/user-attachments/assets/11f11cfb-4df9-4a46-87cd-6ca594511471" />
 
-<img width="2184" height="1166" alt="Gráfica de ángulo Pitch" src="https://github.com/user-attachments/assets/8d356107-4641-4839-b96b-425f9b3bc812" />
 Ángulo Pitch: Ilustra la evolución del ángulo de cabeceo. Exhibe un pequeño transitorio inicial debido al acoplamiento dinámico antes de asentarse de manera completamente horizontal en estado estacionario.
+<img width="2184" height="1166" alt="Gráfica de ángulo Pitch" src="https://github.com/user-attachments/assets/8d356107-4641-4839-b96b-425f9b3bc812" />
 
-<img width="2184" height="1166" alt="Gráfica de ángulo Roll" src="https://github.com/user-attachments/assets/26562e65-5041-4e23-a67b-55fdc1eea755" />
 Ángulo Roll: Muestra el comportamiento del ángulo de alabeo. Presenta la compensación inicial de la inclinación lateral correspondiente al acoplamiento de los ejes antes de mantenerse estable en 0°.
+<img width="2184" height="1166" alt="Gráfica de ángulo Roll" src="https://github.com/user-attachments/assets/26562e65-5041-4e23-a67b-55fdc1eea755" />
 
-<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/0b7ef997-bc66-4cbc-b189-3b9c86487593" />
 Ángulo Yaw: Refleja la orientación del ángulo de guiñada, el cual converge de forma uniforme y estable hacia el valor de referencia establecido.
+<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/0b7ef997-bc66-4cbc-b189-3b9c86487593" />
 
 ---
 
