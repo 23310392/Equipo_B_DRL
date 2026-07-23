@@ -52,26 +52,17 @@ La transformación del E88 a un dron FPV funcional requirió una actualización 
 
 ---
 
-## 💻 Programación y Configuración (Betaflight)
+## 💻 Programación y Lógica de Vuelo (Custom Firmware)
 
-El cerebro de este dron funciona gracias al firmware open-source **Betaflight**. 
+El "cerebro" de este dron no utiliza un firmware comercial prefabricado, sino que funciona con un controlador de vuelo personalizado programado desde cero para el microcontrolador ESP32.
 
-**¿Cómo funciona el código/configuración?**
-Betaflight se encarga de tomar las lecturas del giroscopio (movimiento real) y compararlas con las entradas del piloto en el control remoto (movimiento deseado). A través de un bucle de control PID (Proporcional, Integral, Derivativo) que se ejecuta miles de veces por segundo, el código calcula los ajustes necesarios y envía señales a los ESCs para variar la velocidad de cada motor de forma independiente. 
+*   **Estación de Control Terrestre (Interfaz Web y WebSockets):** Para este proyecto, decidimos prescindir de un radio control físico tradicional debido a limitaciones de tiempo y presupuesto. En su lugar, el ESP32 está configurado como un Punto de Acceso (AP) que genera su propia red Wi-Fi y aloja una interfaz web construida en HTML, CSS y JavaScript. Elegimos esta arquitectura web por su inmensa practicidad y facilidad de implementación: nos permite pilotar el dron desde cualquier smartphone directamente en el navegador, sin necesidad de instalar aplicaciones de terceros. Para garantizar que los movimientos de los joysticks virtuales lleguen al dron sin retrasos perceptibles, la comunicación bidireccional se realiza mediante el protocolo WebSockets.
 
-Para este modelo específico, la configuración se enfocó en:
-1.  **Mapeo de Motores (Mixer):** Ajuste de la geometría personalizada basada en la estructura modificada del E88.
-2.  **Filtros (Filtering):** Configuración de filtros (RPM Filter, Dynamic Notch) para lidiar con las frecuencias de resonancia específicas de nuestro chasis y evitar que el ruido llegue a los motores.
-3.  **Tuning PID:** Ajustes de las ganancias basados en los resultados obtenidos previamente en la simulación de MATLAB para un vuelo *locked-in* y suave.
+*   **Fusión de Sensores (Filtro Complementario):** Para que el dron "sienta" su orientación en el espacio, el ESP32 se comunica mediante el protocolo I2C con un sensor IMU MPU-6050. El código implementa un Filtro Complementario matemático que fusiona las lecturas rápidas del giroscopio con la referencia absoluta de la gravedad del acelerómetro, eliminando el ruido mecánico y el drift (desviación) a lo largo del tiempo.
 
-*(Opcional: Puedes incluir aquí un fragmento de tu configuración CLI de Betaflight o `diff all`)*
-```text
-# Ejemplo de configuración CLI clave
-board_name = [TU_PLACA]
-set motor_pwm_protocol = DSHOT600
-set pid_process_denom = 1
-# ...
-```
+*   **Lazo de Control PID:** El corazón del vuelo autónomo es nuestro bucle PID (Proporcional, Integral, Derivativo), diseñado para ejecutarse a alta velocidad (aprox. 100Hz). El código compara constantemente la orientación real del dron (medida por el MPU-6050) con la orientación deseada por el piloto en la interfaz web. El PID calcula instantáneamente la compensación necesaria en los ejes de Cabeceo (Pitch), Alabeo (Roll) y Guiñada (Yaw) para corregir cualquier desviación.
+
+*   **Matriz de Mezcla de Motores (Mixer Quad-X):** Basándonos en la cinemática estándar de los drones cuadricópteros, los resultados del cálculo PID se introducen en un algoritmo de mezcla de motores. Este sistema distribuye matemáticamente la potencia necesaria a cada uno de los cuatro motores de forma independiente mediante señales PWM. Esto permite que el dron contrarreste la gravedad, obedezca los comandos direccionales y se estabilice a sí mismo frente a perturbaciones externas.
 
 ---
 
