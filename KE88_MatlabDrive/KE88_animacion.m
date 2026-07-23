@@ -1,8 +1,4 @@
 function KE88_animacion(out)
-%KE88_ANIMACION Reproduce en 3D el vuelo simulado del KE88.
-% Uso: despues de correr la simulacion en Simulink, escribe en la consola:
-%       KE88_animacion(out)
-% ("out" es la variable que Simulink deja en el workspace con los datos)
 
 if nargin < 1
     out = evalin('base','out');
@@ -13,13 +9,51 @@ X = out.x_log.signals.values;      % N x 12
 global P
 if isempty(P), KE88_parametros; end
 
-% --- geometria del dron para dibujar ---
-b = 1.6;                            % factor visual (agranda el dron)
-m1 = b*[ P.dx;  P.dy; 0];  m2 = b*[ P.dx; -P.dy; 0];
-m3 = b*[-P.dx; -P.dy; 0];  m4 = b*[-P.dx;  P.dy; 0];
+% ---------- parametros de ajuste del modelo STL ----------
+% Si el modelo se ve "de cabeza" y/o el frente apunta al costado,
+% ajusta estos 3 angulos (en grados) hasta que se vea bien.
+% Se aplican en orden: primero ROLL, luego PITCH, luego YAW.
+ESCALA_STL      = 0.0017;
+ROLL_OFFSET_DEG  = 180;   % gira el modelo sobre su eje "adelante" (x) -> corrige que vuele de espaldas
+PITCH_OFFSET_DEG = 0;     % gira el modelo sobre su eje "izquierda" (y)
+YAW_OFFSET_DEG    = 90;   % gira el modelo sobre su eje vertical (z)  -> ya corregia el frente
 
+% ---------- cargar y preparar el modelo STL ----------
+ruta_stl = fullfile(fileparts(mfilename('fullpath')), 'Dron_Equipo_A.STL');
+TR = stlread(ruta_stl);
+V  = TR.Points;
+F  = TR.ConnectivityList;
+
+c = (max(V,[],1) + min(V,[],1)) / 2;
+V = V - c;
+
+% En Dron_Equipo_A.STL el eje vertical del dron YA es la Z nativa
+% (a diferencia de DronNaya.STL, aqui no hace falta reordenar ejes).
+Vb = V;
+
+cr=cosd(ROLL_OFFSET_DEG); sr=sind(ROLL_OFFSET_DEG);
+cp=cosd(PITCH_OFFSET_DEG); sp=sind(PITCH_OFFSET_DEG);
+cy=cosd(YAW_OFFSET_DEG);  sy=sind(YAW_OFFSET_DEG);
+Rx_ = [1 0 0; 0 cr -sr; 0 sr cr];
+Ry_ = [cp 0 sp; 0 1 0; -sp 0 cp];
+Rz_ = [cy -sy 0; sy cy 0; 0 0 1];
+R_ajuste = Rz_ * Ry_ * Rx_;
+Vb = (R_ajuste * Vb')';
+
+diag_real = 2*sqrt(P.dx^2 + P.dy^2);
+span      = Vb(:,[1 2]);
+diag_stl  = norm(max(span,[],1) - min(span,[],1));
+if isempty(ESCALA_STL)
+    escala = diag_real / diag_stl;
+else
+    escala = ESCALA_STL;
+end
+Vb = Vb * escala;
+
+% ---------- figura ----------
 fig = figure('Name','KE88 - Gemelo Digital','Color','w');
-ax  = axes('Parent',fig); hold(ax,'on'); grid(ax,'on'); view(ax,3);
+ax  = axes('Parent',fig); hold(ax,'on'); grid(ax,'on'); view(ax,45,20);
+axis(ax,'equal');
 xlabel('x [m]'); ylabel('y [m]'); zlabel('z [m]');
 title('Simulacion KE88');
 
@@ -27,34 +61,37 @@ title('Simulacion KE88');
 [gx,gy] = meshgrid(-3:0.5:3);
 surf(ax,gx,gy,0*gx,'FaceColor',[0.92 0.95 0.92],'EdgeColor',[0.8 0.85 0.8]);
 
-h_arm1  = plot3(ax,nan,nan,nan,'k-','LineWidth',3);            % brazo M1-M3
-h_arm2  = plot3(ax,nan,nan,nan,'k-','LineWidth',3);            % brazo M2-M4
-h_props = plot3(ax,nan,nan,nan,'o','MarkerSize',9,...
-    'MarkerFaceColor',[0.2 0.6 0.3],'MarkerEdgeColor','k');
-h_nose  = plot3(ax,nan,nan,nan,'r.','MarkerSize',20);          % frente
-h_trail = plot3(ax,nan,nan,nan,'b-','LineWidth',1);            % estela
+hT = hgtransform('Parent',ax);
+patch('Parent',hT,'Faces',F,'Vertices',Vb, ...
+    'FaceColor',[0.25 0.55 0.85],'EdgeColor','none', ...
+    'FaceLighting','gouraud','AmbientStrength',0.4);
+camlight(ax,'headlight'); lighting(ax,'gouraud'); material(ax,'dull');
 
-% submuestreo para ~25 cuadros por segundo de vuelo
+h_trail = plot3(ax,nan,nan,nan,'b-','LineWidth',1);
+
+% submuestreo para ~25 FPS de vuelo
 paso = max(1, round(numel(t)/(t(end)*25)));
 
 for k = 1:paso:numel(t)
     if ~isvalid(fig), return; end
-    pos = X(k,1:3)';  eul = X(k,7:9)';
+
+    pos = X(k,1:3)';
+    eul = X(k,7:9)';
+
+    % *** CLAMPING: el dron nunca se dibuja bajo el suelo ***
+    pos(3) = max(pos(3), 0);
+
     R = rotZYX(eul);
-    p1=pos+R*m1; p2=pos+R*m2; p3=pos+R*m3; p4=pos+R*m4;
-    nose = pos + R*[b*P.dx*1.4;0;0];
+    Tm = eye(4); Tm(1:3,1:3) = R; Tm(1:3,4) = pos;
+    set(hT,'Matrix',Tm);
 
-    set(h_arm1,'XData',[p1(1) p3(1)],'YData',[p1(2) p3(2)],'ZData',[p1(3) p3(3)]);
-    set(h_arm2,'XData',[p2(1) p4(1)],'YData',[p2(2) p4(2)],'ZData',[p2(3) p4(3)]);
-    set(h_props,'XData',[p1(1) p2(1) p3(1) p4(1)],...
-                'YData',[p1(2) p2(2) p3(2) p4(2)],...
-                'ZData',[p1(3) p2(3) p3(3) p4(3)]);
-    set(h_nose,'XData',nose(1),'YData',nose(2),'ZData',nose(3));
-    set(h_trail,'XData',X(1:k,1),'YData',X(1:k,2),'ZData',X(1:k,3));
+    % Estela: usar Z clamped para que no vaya bajo tierra
+    trail_z = max(X(1:k,3)', 0);
+    set(h_trail,'XData',X(1:k,1),'YData',X(1:k,2),'ZData',trail_z);
 
-    % la camara sigue al dron
-    axis(ax,[pos(1)-1.5 pos(1)+1.5 pos(2)-1.5 pos(2)+1.5 0 max(2,pos(3)+1)]);
-    title(ax,sprintf('KE88  t = %.1f s   altura = %.2f m',t(k),pos(3)));
+    % Camara: Z siempre >= 0
+    axis(ax,[pos(1)-1.5 pos(1)+1.5  pos(2)-1.5 pos(2)+1.5  0  max(2, pos(3)+1)]);
+    title(ax,sprintf('KE88  t = %.1f s   altura = %.2f m', t(k), pos(3)));
     drawnow limitrate
 end
 end
