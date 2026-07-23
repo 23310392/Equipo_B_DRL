@@ -21,15 +21,16 @@ Al partir del modelo E88, se identificaron varias áreas de mejora estructural. 
 
 Para comprender el comportamiento dinámico del dron y predecir su respuesta a los comandos de control, se desarrolló un modelo matemático en MATLAB. A continuación se presenta la evidencia fotográfica y gráfica de las ondas de comportamiento de nuestro modelo (por ejemplo, respuesta al escalón, ajuste de PIDs teórico, estabilización de altitud).
 
-> **Evidencia de Ondas de Comportamiento:**
-> 
-> *<!-- Reemplaza las rutas de las imágenes con tus propias capturas de MATLAB -->*
-> 
-> ![Gráfica de Respuesta de Roll/Pitch](ruta/a/tu/imagen_matlab_1.png)
-> *Figura 1: Comportamiento del sistema ante una perturbación en el eje X.*
->
-> ![Gráfica de Estabilización](ruta/a/tu/imagen_matlab_2.png)
-> *Figura 2: Simulación de la estabilización del dron en vuelo estacionario.*
+### Diagrama de control
+![Modelo dron NERV/Diagrama de control.png]
+
+Este diagrama implementa un **sistema de control en cascada** para la estabilización y seguimiento de trayectoria de un modelo no lineal de 6 grados de libertad (`Modelo_NERV`) en Simulink.
+
+### 📐 Arquitectura del Sistema
+* **Control de Posición (Lazos Externos):** Regula las coordenadas de translación en los ejes $X$, $Y$ y la altura ($Z$), generando las referencias de actitud correspondientes.
+* **Control de Actitud (Lazos Internos):** Estabiliza la orientación del vehículo gestionando los ángulos de **Roll** ($\phi$), **Pitch** ($\theta$) y **Yaw** ($\psi$).
+* **Planta No Lineal:** Integra la dinámica de vuelo de 6-DOF (`Modelo_NERV`) junto con bloques de integración temporal y realimentación de estados.
+* **Visualización:** Monitoreo en tiempo real de la posición espacial y el comportamiento de los ángulos de Euler mediante bloques *Scope*.
 
 ---
 
