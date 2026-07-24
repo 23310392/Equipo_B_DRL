@@ -14,6 +14,8 @@ MARK I
 Reducción de peso y distribución de masa: El chasis fue diseñado con dimensiones inferiores a 5 pulgadas, optimizando la geometría para reducir el peso sin comprometer la rigidez estructural. La distribución de la masa se concentró en la parte central del dron para favorecer la estabilidad y mejorar la respuesta durante el vuelo.
 Materiales: El diseño está pensado para ser fabricado mediante impresión 3D en ABS, material que ofrece una buena relación entre resistencia mecánica, durabilidad y facilidad de fabricación. Esto permite obtener un prototipo ligero, resistente y de bajo costo para pruebas y validación.
 Integración de la electrónica: Este primer diseño se enfocó principalmente en el desarrollo de la estructura mecánica. No se definieron alojamientos ni puntos de montaje específicos para los componentes electrónicos, por lo que durante el ensamblaje se identificó que elementos como la batería, el Arduino Nano ESP32, el MPU6050, los ESC, el cableado y otros componentes no contaban con el espacio necesario para una integración adecuada. Estas limitaciones sirvieron como base para el rediseño de versiones posteriores.
+<img width="900" height="557" alt="Mark I" src="https://github.com/user-attachments/assets/98e30763-4ad8-47eb-89ef-0c270d70b6e1" />
+
 
 
 MARK II
@@ -21,6 +23,8 @@ Reducción de peso y distribución de masa: Para esta segunda iteración se real
 Materiales: Al igual que en el MARK I, el prototipo fue diseñado para ser fabricado mediante impresión 3D en ABS. La elección de este material respondió a su buena resistencia mecánica, su capacidad para soportar impactos moderados y las temperaturas generadas durante la operación de los componentes electrónicos. Asimismo, el uso de impresión 3D permitió fabricar y evaluar rápidamente nuevas iteraciones del diseño, reduciendo los tiempos de desarrollo y el costo de fabricación de los prototipos.
 Diseño estructural: Durante esta iteración se incorporaron características propias de los chasis utilizados en drones FPV comerciales. Entre ellas destacan el soporte frontal para el montaje de la cámara, una cubierta superior desmontable para facilitar el acceso a la electrónica y una estructura interna pensada para organizar los diferentes módulos del sistema. Estas modificaciones representaron un avance significativo respecto al MARK I, ya que permitieron obtener un diseño más compacto, estético y cercano a una solución funcional.
 Integración de la electrónica: Una de las principales mejoras del MARK II fue la incorporación de espacios destinados al montaje de la batería y otros componentes electrónicos. Sin embargo, durante el proceso de ensamblaje se identificó que las dimensiones utilizadas durante el modelado no coincidían con las medidas reales de varios de estos componentes. Como consecuencia, algunos elementos no podían instalarse correctamente o requerían modificaciones adicionales para su montaje. Esta situación evidenció la importancia de realizar un levantamiento dimensional más preciso antes de la etapa de diseño, así como de considerar tolerancias de fabricación y ensamblaje. Las observaciones obtenidas durante esta fase sirvieron como base para el desarrollo del MARK III, donde se redimensionaron los compartimientos internos y se optimizó la distribución de los componentes para garantizar una integración adecuada.
+<img width="1773" height="1246" alt="Mark II" src="https://github.com/user-attachments/assets/949c73b5-c0b4-4093-afb0-7699102cbafe" />
+
 
 
 MARK III
