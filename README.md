@@ -19,7 +19,9 @@ En esta sección se documentan las decisiones de diseño tomadas para llegar a l
 <strong>Integración de la electrónica:</strong> Este primer diseño se enfocó principalmente en el desarrollo de la estructura mecánica. No se definieron alojamientos ni puntos de montaje específicos para los componentes electrónicos, por lo que durante el ensamblaje se identificó que elementos como la batería, el Arduino Nano ESP32, el MPU6050, los ESC, el cableado y otros componentes no contaban con el espacio necesario para una integración adecuada. Estas limitaciones sirvieron como base para el rediseño de versiones posteriores.
 </p>
 
-<img width="600" height="400" alt="Mark I" src="https://github.com/user-attachments/assets/98e30763-4ad8-47eb-89ef-0c270d70b6e1" />
+<p align="center">
+  <img width="650" height="450" alt="Mark I" src="https://github.com/user-attachments/assets/98e30763-4ad8-47eb-89ef-0c270d70b6e1" />
+</p>
 
 <p align="justify">
 <strong>MARK II</strong><br>
@@ -29,13 +31,15 @@ En esta sección se documentan las decisiones de diseño tomadas para llegar a l
 <strong>Integración de la electrónica:</strong> Una de las principales mejoras del MARK II fue la incorporación de espacios destinados al montaje de la batería y otros componentes electrónicos. Sin embargo, durante el proceso de ensamblaje se identificó que las dimensiones utilizadas durante el modelado no coincidían con las medidas reales de varios de estos componentes. Como consecuencia, algunos elementos no podían instalarse correctamente o requerían modificaciones adicionales para su montaje. Esta situación evidenció la importancia de realizar un levantamiento dimensional más preciso antes de la etapa de diseño, así como de considerar tolerancias de fabricación y ensamblaje. Las observaciones obtenidas durante esta fase sirvieron como base para el desarrollo del MARK III, donde se redimensionaron los compartimientos internos y se optimizó la distribución de los componentes para garantizar una integración adecuada.
 </p>
 
-<img width="600" height="400" alt="Mark II" src="https://github.com/user-attachments/assets/949c73b5-c0b4-4093-afb0-7699102cbafe" />
+<p align="center">
+  <img width="650" height="450" alt="Mark II" src="https://github.com/user-attachments/assets/949c73b5-c0b4-4093-afb0-7699102cbafe" />
+</p>
 
 <p align="justify">
 <strong>MARK III</strong><br>
 <strong>Reducción de peso y distribución de masa:</strong> A diferencia de las iteraciones anteriores, en este diseño se decidió abandonar la restricción de construir un dron con dimensiones inferiores a 5 pulgadas. Durante el desarrollo se comprobó que los componentes electrónicos seleccionados requerían un mayor espacio para su integración, por lo que mantener ese límite comprometía tanto el ensamblaje como la distribución del peso. Como resultado, se diseñó un chasis completamente nuevo, con dimensiones personalizadas que permitieran alojar todos los componentes sin afectar la estabilidad ni la accesibilidad. La nueva distribución de masa se centró en mantener el centro de gravedad lo más cercano posible al eje del dron, favoreciendo un comportamiento estable durante el vuelo.<br>
 <strong>Materiales:</strong> El chasis continúa siendo fabricado mediante impresión 3D en ABS, material seleccionado por su resistencia mecánica, durabilidad y facilidad de fabricación. El uso de este material permitió mantener un peso estructural relativamente bajo, además de facilitar la fabricación de piezas personalizadas y futuras modificaciones sin incrementar significativamente los costos del proyecto.<br>
-<strong>Diseño estructural:</strong> El MARK III representa un rediseño completo respecto a los prototipos anteriores. Tanto la geometría como las dimensiones fueron desarrolladas específicamente para satisfacer las necesidades del proyecto, sin seguir strictly las medidas convencionales de los drones FPV comerciales. Se priorizó la funcionalidad sobre el tamaño, obteniendo un chasis más amplio que proporciona una mejor distribución interna, mayor facilidad de ensamblaje y acceso a los componentes para tareas de mantenimiento. Aunque sus dimensiones son mayores que las de los prototipos MARK I y MARK II, el diseño mantiene una estructura robusta, práctica y cómoda para su manipulación.<br>
+<strong>Diseño estructural:</strong> El MARK III representa un rediseño completo respecto a los prototipos anteriores. Tanto la geometría como las dimensiones fueron desarrolladas específicamente para satisfacer las necesidades del proyecto, sin seguir estrictamente las medidas convencionales de los drones FPV comerciales. Se priorizó la funcionalidad sobre el tamaño, obteniendo un chasis más amplio que proporciona una mejor distribución interna, mayor facilidad de ensamblaje y acceso a los componentes para tareas de mantenimiento. Aunque sus dimensiones son mayores que las de los prototipos MARK I y MARK II, el diseño mantiene una estructura robusta, práctica y cómoda para su manipulación.<br>
 <strong>Integración de la electrónica:</strong> Todas las dimensiones del chasis fueron ajustadas tomando como referencia las medidas reales de los componentes electrónicos. Esto permitió integrar correctamente la batería, el Arduino Nano ESP32, el MPU6050, los ESC, los motores, el sistema de distribución del cableado y los demás elementos necesarios para el funcionamiento del dron. A diferencia de las versiones anteriores, todos los componentes pueden instalarse sin interferencias mecánicas, facilitando el ensamblaje y el mantenimiento del sistema.<br>
 <strong>Peso del prototipo:</strong> El chasis impreso y completamente ensamblado presenta un peso aproximado de 337 g. Una vez instalados todos los componentes electrónicos, el peso total del dron permanece por debajo de los 950 g, cumpliendo con el objetivo de mantener una plataforma suficientemente ligera para operar sin comprometer la resistencia estructural. Este equilibrio entre peso, espacio disponible y robustez convierte al MARK III en el diseño final del proyecto y en la versión que satisface completamente los requerimientos establecidos por el equipo.
 </p>
@@ -49,7 +53,9 @@ Para comprender el comportamiento dinámico del dron y predecir su respuesta a l
 </p>
 
 ### Diagrama de control
-<img width="962" height="712" alt="Diagrama de control" src="https://github.com/user-attachments/assets/84e2185d-0bf3-4349-8312-b6d280ddee65" />
+<p align="center">
+  <img width="650" height="500" alt="Diagrama de control" src="https://github.com/user-attachments/assets/84e2185d-0bf3-4349-8312-b6d280ddee65" />
+</p>
 
 <p align="justify">
 Este diagrama implementa un <strong>sistema de control en cascada</strong> para la estabilización y seguimiento de trayectoria de un modelo no lineal de 6 grados de libertad (<code>Modelo_NERV</code>) en Simulink.
@@ -65,32 +71,44 @@ Este diagrama implementa un <strong>sistema de control en cascada</strong> para 
 <p align="justify">
 <strong>Movimiento en X</strong>: Representa el desplazamiento lineal en el eje X. Se observa una transición limpia y rápida que alcanza la posición objetivo de 2m sin sobreimpulsos agresivos.
 </p>
-<img width="2184" height="1166" alt="Gráfica de movimiento en X" src="https://github.com/user-attachments/assets/ab90fce3-ff6e-4937-9438-a0f3afded2bc" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de movimiento en X" src="https://github.com/user-attachments/assets/ab90fce3-ff6e-4937-9438-a0f3afded2bc" />
+</p>
 
 <p align="justify">
 <strong>Movimiento en Y</strong>: Muestra la respuesta en el eje Y alcanzando de forma estable y asintótica el valor de referencia configurado en 1m.
 </p>
-<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/ea59f573-c938-4c1e-aef7-9efca886711a" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/ea59f573-c938-4c1e-aef7-9efca886711a" />
+</p>
 
 <p align="justify">
 <strong>Movimiento en Z (Altura)</strong>: Muestra la respuesta escalón de la altitud del cuadricóptero. Presenta un ligero sobreimpulso controlado durante los primeros segundos antes de estabilizarse suavemente en la referencia deseada de 2m.
 </p>
-<img width="2184" height="1166" alt="Gráfica de movimiento en Z" src="https://github.com/user-attachments/assets/11f11cfb-4df9-4a46-87cd-6ca594511471" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de movimiento en Z" src="https://github.com/user-attachments/assets/11f11cfb-4df9-4a46-87cd-6ca594511471" />
+</p>
 
 <p align="justify">
 <strong>Ángulo Pitch</strong>: Ilustra la evolución del ángulo de cabeceo. Exhibe un pequeño transitorio inicial debido al acoplamiento dinámico antes de asentarse de manera completamente horizontal en estado estacionario.
 </p>
-<img width="2184" height="1166" alt="Gráfica de ángulo Pitch" src="https://github.com/user-attachments/assets/8d356107-4641-4839-b96b-425f9b3bc812" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de ángulo Pitch" src="https://github.com/user-attachments/assets/8d356107-4641-4839-b96b-425f9b3bc812" />
+</p>
 
 <p align="justify">
 <strong>Ángulo Roll</strong>: Muestra el comportamiento del ángulo de alabeo. Presenta la compensación inicial de la inclinación lateral correspondiente al acoplamiento de los ejes antes de mantenerse estable en 0°.
 </p>
-<img width="2184" height="1166" alt="Gráfica de ángulo Roll" src="https://github.com/user-attachments/assets/26562e65-5041-4e23-a67b-55fdc1eea755" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de ángulo Roll" src="https://github.com/user-attachments/assets/26562e65-5041-4e23-a67b-55fdc1eea755" />
+</p>
 
 <p align="justify">
 <strong>Ángulo Yaw</strong>: Refleja la orientación del ángulo de guiñada, el cual converge de forma uniforme y estable hacia el valor de referencia establecido.
 </p>
-<img width="2184" height="1165" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/0b7ef997-bc66-4cbc-b189-3b9c86487593" />
+<p align="center">
+  <img width="650" height="500" alt="Gráfica de movimiento en Y" src="https://github.com/user-attachments/assets/0b7ef997-bc66-4cbc-b189-3b9c86487593" />
+</p>
 
 ---
 
