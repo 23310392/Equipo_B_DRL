@@ -29,6 +29,7 @@ Materiales: El chasis continúa siendo fabricado mediante impresión 3D en ABS, 
 Diseño estructural: El MARK III representa un rediseño completo respecto a los prototipos anteriores. Tanto la geometría como las dimensiones fueron desarrolladas específicamente para satisfacer las necesidades del proyecto, sin seguir estrictamente las medidas convencionales de los drones FPV comerciales. Se priorizó la funcionalidad sobre el tamaño, obteniendo un chasis más amplio que proporciona una mejor distribución interna, mayor facilidad de ensamblaje y acceso a los componentes para tareas de mantenimiento. Aunque sus dimensiones son mayores que las de los prototipos MARK I y MARK II, el diseño mantiene una estructura robusta, práctica y cómoda para su manipulación.
 Integración de la electrónica: Todas las dimensiones del chasis fueron ajustadas tomando como referencia las medidas reales de los componentes electrónicos. Esto permitió integrar correctamente la batería, el Arduino Nano ESP32, el MPU6050, los ESC, los motores, el sistema de distribución del cableado y los demás elementos necesarios para el funcionamiento del dron. A diferencia de las versiones anteriores, todos los componentes pueden instalarse sin interferencias mecánicas, facilitando el ensamblaje y el mantenimiento del sistema.
 Peso del prototipo: El chasis impreso y completamente ensamblado presenta un peso aproximado de 337 g. Una vez instalados todos los componentes electrónicos, el peso total del dron permanece por debajo de los 950 g, cumpliendo con el objetivo de mantener una plataforma suficientemente ligera para operar sin comprometer la resistencia estructural. Este equilibrio entre peso, espacio disponible y robustez convierte al MARK III en el diseño final del proyecto y en la versión que satisface completamente los requerimientos establecidos por el equipo.
+
 ---
 
 ## 📈 Modelado Matemático y Simulación en MATLAB
@@ -185,13 +186,3 @@ El "cerebro" de este dron no utiliza un firmware comercial prefabricado, sino qu
 
 En esta sección se muestra el resultado final del ensamblaje del dron, detallando el empaquetado de los componentes, la gestión de cables (cable management) y la estética final de la aeronave.
 
-> *<!-- Reemplaza las rutas de las imágenes con fotografías de tu dron armado -->*
-> 
-> ![Vista Superior del Dron](ruta/a/tu/foto_superior.jpg)
-> *Vista superior del ensamblaje final.*
->
-> ![Vista Lateral - Perfil Aerodinámico](ruta/a/tu/foto_lateral.jpg)
-> *Vista lateral mostrando el montaje de la cámara FPV y la batería.*
->
-> ![Detalle de la Electrónica](ruta/a/tu/foto_electronica.jpg)
-> *Detalle del apilamiento (stack) de la controladora de vuelo y los ESCs.*
