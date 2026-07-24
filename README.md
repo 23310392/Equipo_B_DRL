@@ -19,7 +19,7 @@ En esta sección se documentan las decisiones de diseño tomadas para llegar a l
 <strong>Integración de la electrónica:</strong> Este primer diseño se enfocó principalmente en el desarrollo de la estructura mecánica. No se definieron alojamientos ni puntos de montaje específicos para los componentes electrónicos, por lo que durante el ensamblaje se identificó que elementos como la batería, el Arduino Nano ESP32, el MPU6050, los ESC, el cableado y otros componentes no contaban con el espacio necesario para una integración adecuada. Estas limitaciones sirvieron como base para el rediseño de versiones posteriores.
 </p>
 
-<img width="900" height="557" alt="Mark I" src="https://github.com/user-attachments/assets/98e30763-4ad8-47eb-89ef-0c270d70b6e1" />
+<img width="600" height="400" alt="Mark I" src="https://github.com/user-attachments/assets/98e30763-4ad8-47eb-89ef-0c270d70b6e1" />
 
 <p align="justify">
 <strong>MARK II</strong><br>
@@ -29,7 +29,7 @@ En esta sección se documentan las decisiones de diseño tomadas para llegar a l
 <strong>Integración de la electrónica:</strong> Una de las principales mejoras del MARK II fue la incorporación de espacios destinados al montaje de la batería y otros componentes electrónicos. Sin embargo, durante el proceso de ensamblaje se identificó que las dimensiones utilizadas durante el modelado no coincidían con las medidas reales de varios de estos componentes. Como consecuencia, algunos elementos no podían instalarse correctamente o requerían modificaciones adicionales para su montaje. Esta situación evidenció la importancia de realizar un levantamiento dimensional más preciso antes de la etapa de diseño, así como de considerar tolerancias de fabricación y ensamblaje. Las observaciones obtenidas durante esta fase sirvieron como base para el desarrollo del MARK III, donde se redimensionaron los compartimientos internos y se optimizó la distribución de los componentes para garantizar una integración adecuada.
 </p>
 
-<img width="1773" height="1246" alt="Mark II" src="https://github.com/user-attachments/assets/949c73b5-c0b4-4093-afb0-7699102cbafe" />
+<img width="600" height="400" alt="Mark II" src="https://github.com/user-attachments/assets/949c73b5-c0b4-4093-afb0-7699102cbafe" />
 
 <p align="justify">
 <strong>MARK III</strong><br>
