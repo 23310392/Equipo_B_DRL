@@ -44,6 +44,48 @@ Aunque la placa cuenta con conectividad Wi-Fi y buena capacidad de procesamiento
 
 ---
 
+#  Reporte técnico de fallas y correcciones en dron
+### Elaborado por: Flores Gonzalez Byron Zadquiel (Ingeniero en Comunicaciones)
+
+## 🔧 Principales aspectos a revisar
+
+### 1. Calibración de sensores (IMU y acelerómetro)
+- Una mala calibración provoca que el controlador interprete inclinaciones inexistentes.
+- Es fundamental realizar la calibración inicial en superficie plana y repetirla periódicamente.
+
+### 2. Sentido de giro de motores y hélices
+- Problema más común: hélice invertida o motor girando en dirección incorrecta.
+- Verificar que cada motor y hélice correspondan al sentido de giro indicado por el diseño del dron.
+
+### 3. Centro de gravedad
+- La electrónica y cableado concentrados en un lado, o batería elevada, desplazan el centro de masa.
+- El centro de gravedad debe estar lo más cercano posible al centro del chasis para estabilidad.
+
+### 4. Ajuste de los PID
+- Valores incorrectos de P, I y D generan rebotes, vibraciones o giros descontrolados.
+- Requiere sintonización cuidadosa para lograr respuesta estable y suave.
+
+### 5. Vibraciones
+- Revisar que las hélices estén balanceadas.
+- Comprobar que los motores no tengan ejes doblados.
+- Asegurar que el controlador de vuelo esté firmemente sujeto.
+
+### 6. Interferencias electromagnéticas
+- Separar antenas de receptor 2.4 GHz y transmisor de video.
+- Mantener cableado de potencia alejado de líneas de señal para reducir ruido.
+
+### 7. ESC (Controladores de velocidad electrónicos)
+- Calibrar los variadores para que todos respondan de forma uniforme al acelerador.
+- Verificar que cada ESC entregue la misma potencia y respuesta dinámica.
+
+---
+
+## ✅ Conclusión
+La estabilidad y rendimiento del dron dependen de una correcta calibración de sensores, ajuste de PID, balance de hélices, y distribución adecuada del centro de gravedad. Además, la mitigación de vibraciones e interferencias electromagnéticas asegura una comunicación confiable y un vuelo seguro.
+
+
+---
+
 <p align="center">
   📂 <i>Este análisis queda registrado como base de conocimiento para futuras iteraciones del proyecto.</i><br>
   ⬅️ <a href="./README.md">Volver al README Principal</a>
