@@ -2,6 +2,14 @@
 
 # N.E.R.V. Protocol
 
+INTEGRANTES:
+
+* COVARRUBIAS SÁNCHEZ ESTEFHANY BETZABE - 23310387
+* CORTES VILLA DANIEL - 23310392
+* DURAN DE HUERTA JIMENEZ ALEX - 23310378
+* FLORES GONZALEZ BYRON ZADQUIEL - 23310338
+* TORRES HERNANDEZ ELIAS URIEL - 23310395
+
 # Proyecto: Dron FPV Modificado (Ingeniería Inversa E88)
 
 Este repositorio documenta todo el proceso de diseño, análisis, configuración y ensamblaje de un dron FPV personalizado. Este proyecto nace a partir de la aplicación de ingeniería inversa a un dron comercial modelo E88, con el objetivo de mejorar sus características de vuelo, adaptarlo para FPV (First Person View) y optimizar su rendimiento general.
