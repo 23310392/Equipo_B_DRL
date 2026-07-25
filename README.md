@@ -250,4 +250,11 @@ El "cerebro" de este dron no utiliza un firmware comercial prefabricado, sino qu
 En esta sección se muestra el resultado final del ensamblaje del dron, detallando el empaquetado de los componentes, la gestión de cables (cable management) y la estética final de la aeronave.
 </p>
 
+---
+
+## Documento Post Mortem
+
+<p align="justify">
+Para la información completa de las fallas principales que presentó el dron MARK III y la razón de porqué no se logró realizar un vuelo de "hover", consulte el siguiente link: [Análisis Post-Mortem](./Post Mortem.md). 
+</p>
 </div>
