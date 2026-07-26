@@ -87,7 +87,6 @@ La estabilidad y rendimiento del dron dependen de una correcta calibración de s
 ---
 
 <p align="center">
-  📂 <i>Este análisis queda registrado como base de conocimiento para futuras iteraciones del proyecto.</i><br>
   ⬅️ <a href="./README.md">Volver al README Principal</a>
 </p>
 
