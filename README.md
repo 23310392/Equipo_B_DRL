@@ -258,3 +258,57 @@ En esta sección se muestra el resultado final del ensamblaje del dron, detallan
 Para la información completa de las fallas principales que presentó el dron MARK III y la razón de porqué no se logró realizar un vuelo de "hover", consulte el siguiente link: [Análisis Post-Mortem](./Post Mortem.md). 
 </p>
 </div>
+Ingeniero de diseño
+Durante el desarrollo del dron se realizaron tres iteraciones principales del diseño, denominadas **MARK I**, **MARK II** y **MARK III**. Cada una de ellas permitió identificar áreas de mejora tanto en el diseño mecánico como en el proceso de fabricación mediante impresión 3D.
+
+MARK I y MARK II
+En las primeras dos versiones del proyecto, uno de los principales objetivos fue respetar las dimensiones establecidas para las competencias de drones FPV, procurando que el tamaño del dron no superara las cinco pulgadas.
+Si bien esta restricción cumplía con el objetivo inicial del proyecto, generó un problema importante durante la etapa de integración de los componentes electrónicos. El espacio disponible dentro del chasis era insuficiente para alojar correctamente elementos como:
+- Controlador de vuelo (Flight Controller).
+- ESC (Electronic Speed Controller).
+- Distribuidor de energía (Power Distribution Board).
+- Receptor de radio.
+- Transmisor de video (VTX).
+- Cámara FPV.
+- Batería.
+- Cableado.
+La falta de espacio dificultaba considerablemente el ensamblaje, comprometía el mantenimiento del dron y aumentaba el riesgo de dañar alguno de los componentes durante su instalación.
+
+---
+MARK III
+Como resultado del análisis realizado sobre los dos primeros prototipos, se decidió desarrollar una tercera versión denominada **MARK III**.
+En esta versión se incrementaron deliberadamente las dimensiones generales del chasis, superando el límite de las cinco pulgadas. Aunque esta decisión implicó alejarse del objetivo inicial, permitió resolver completamente el problema de distribución interna de los componentes.
+El nuevo diseño ofreció las siguientes ventajas:
+- Mayor espacio para el acomodo de los componentes electrónicos.
+- Mejor organización del cableado.
+- Ensamblaje más sencillo.
+- Facilidad para realizar mantenimiento.
+- Espacio disponible para futuras modificaciones o incorporación de nuevos componentes.
+
+---
+Problemas durante la impresión 3D
+Una vez solucionado el problema del espacio interno, surgió un nuevo inconveniente relacionado con el proceso de fabricación mediante impresión 3D.
+Durante la impresión de uno de los brazos del dron, no se tomó en consideración el margen de error propio de la manufactura aditiva.
+La pieza presentó una ligera curvatura y un pequeño desfase dimensional. Aunque visualmente la deformación parecía mínima, fue suficiente para provocar una desalineación en la estructura general del dron.
+Como consecuencia, durante las pruebas de vuelo se observó que el dron:
+- Se inclinaba constantemente hacia uno de sus lados.
+- Tenía dificultades para mantenerse estable.
+- Tendía a realizar trayectorias circulares aun cuando el controlador intentaba estabilizarlo.
+Este comportamiento fue causado por la diferencia geométrica entre los brazos del chasis, lo que modificó la distribución de fuerzas y afectó el centro de gravedad del vehículo.
+
+---
+Solución propuesta
+Para futuras versiones del diseño se propone implementar un proceso de validación tanto del diseño como de las piezas impresas antes del ensamblaje final.
+Las principales acciones recomendadas son:
+- Verificar las dimensiones de cada pieza utilizando un calibrador Vernier.
+- Comparar las medidas obtenidas con el modelo CAD original.
+- Sustituir cualquier pieza que presente deformaciones o desviaciones dimensionales.
+- Realizar un ensamblaje de prueba antes de instalar los componentes electrónicos.
+- Ajustar los parámetros de impresión (temperatura, velocidad, altura de capa, porcentaje de relleno y orientación de impresión) para minimizar deformaciones.
+- Considerar tolerancias mecánicas durante el diseño CAD para compensar el margen de error propio de la impresión 3D.
+- Incorporar refuerzos estructurales en los brazos del dron para aumentar su rigidez y reducir posibles deformaciones.
+
+---
+Conclusiones
+El desarrollo de los prototipos **MARK I**, **MARK II** y **MARK III** permitió comprender que el diseño de un dron no depende únicamente de la modelación CAD, sino también de factores relacionados con la manufactura, las tolerancias dimensionales y la correcta integración de todos los componentes electrónicos y mecánicos.
+Cada iteración del proyecto permitió identificar oportunidades de mejora y aplicar soluciones que incrementaron la funcionalidad, la estabilidad y la facilidad de ensamblaje del prototipo final, dejando además una base sólida para futuras versiones del diseño.
