@@ -248,6 +248,8 @@ El "cerebro" de este dron no utiliza un firmware comercial prefabricado, sino qu
 
 <p align="justify">
 En esta sección se muestra el resultado final del ensamblaje del dron, detallando el empaquetado de los componentes, la gestión de cables (cable management) y la estética final de la aeronave.
+<img width="650" height="500" alt="WhatsApp Image 2026-07-25 at 9 10 56 PM" src="https://github.com/user-attachments/assets/2e990ad0-d1c0-47f1-b511-aea128fbc157" />
+
 </p>
 
 ---
