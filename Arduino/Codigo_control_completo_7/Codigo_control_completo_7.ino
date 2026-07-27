@@ -28,7 +28,7 @@ enum DroneState { INICIANDO_ESCS, SUELO, DESPEGANDO, VOLANDO, ATERRIZANDO };
 DroneState estadoDron = INICIANDO_ESCS;
 bool mpuConectado = false; 
 unsigned long tiempoInicioBoot = 0; 
-unsigned long ultimaVezRecibido = 0; // CORRECCIÓN: Variable para el Failsafe
+unsigned long ultimaVezRecibido = 0; 
 
 // Valores en microsegundos para los ESC
 const int MIN_PULSE = 1000;
@@ -138,7 +138,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
   if (type == WStype_TEXT) {
-    // CORRECCIÓN: Registramos el momento exacto en el que recibimos un comando (Failsafe)
     ultimaVezRecibido = millis();
 
     if (strncmp((const char *)payload, "CMD:FLIGHT", 10) == 0) {
@@ -195,14 +194,12 @@ void setup() {
     mpuConectado = true;
   }
   
-  // Guardamos el tiempo exacto de inicio para calibrar de forma no bloqueante
   tiempoInicioBoot = millis();
   tiempoAnterior = micros();
-  Serial.println("Arrancando. Iniciando calibracion de ESCs por 8 segundos...");
+  Serial.println("Arrancando. Iniciando rutina de CALIBRACION AUTOMATICA de ESCs (8 segundos)...");
 }
 
 void loop() {
-  // Siempre se atiende a los clientes web, incluso mientras calibra
   server.handleClient();
   webSocket.loop();
 
@@ -213,27 +210,36 @@ void loop() {
     return; 
   }
 
-  // --- CALIBRACIÓN NO BLOQUEANTE (Los primeros 8 segundos) ---
+  // --- NUEVO: CALIBRACIÓN AUTOMÁTICA DE ESCs ---
   if (estadoDron == INICIANDO_ESCS) {
-    esc1.writeMicroseconds(MIN_PULSE);
-    esc2.writeMicroseconds(MIN_PULSE);
-    esc3.writeMicroseconds(MIN_PULSE);
-    esc4.writeMicroseconds(MIN_PULSE);
+    unsigned long tiempoTranscurrido = millis() - tiempoInicioBoot;
     
-    // Verificamos si ya pasaron 8 segundos desde que encendió
-    if (millis() - tiempoInicioBoot > 8000) {
+    if (tiempoTranscurrido < 4000) {
+      // 1. Enviar señal MÁXIMA durante los primeros 4 segundos
+      esc1.writeMicroseconds(MAX_PULSE);
+      esc2.writeMicroseconds(MAX_PULSE);
+      esc3.writeMicroseconds(MAX_PULSE);
+      esc4.writeMicroseconds(MAX_PULSE);
+    } else if (tiempoTranscurrido < 8000) {
+      // 2. Bajar a señal MÍNIMA por otros 4 segundos
+      esc1.writeMicroseconds(MIN_PULSE);
+      esc2.writeMicroseconds(MIN_PULSE);
+      esc3.writeMicroseconds(MIN_PULSE);
+      esc4.writeMicroseconds(MIN_PULSE);
+    } else {
+      // 3. Finalizar calibración
       estadoDron = SUELO;
-      Serial.println("ESCs Armados y Listos para volar.");
+      Serial.println("Calibracion completada. ESCs Armados y Listos para volar.");
     }
     return; // Sale del loop para no calcular PIDs mientras calibra
   }
 
-  // --- CORRECCIÓN: FAILSAFE DE COMUNICACIÓN ---
+  // --- FAILSAFE DE COMUNICACIÓN ---
   if (estadoDron == VOLANDO || estadoDron == DESPEGANDO) {
-    if (millis() - ultimaVezRecibido > 1000) { // Si pasa más de 1 segundo sin señal
+    if (millis() - ultimaVezRecibido > 1000) {
       Serial.println("¡CONEXION PERDIDA! Aterrizaje de emergencia...");
       throttleManual = 0; pitchManual = 0; rollManual = 0; yawManual = 0;
-      estadoDron = ATERRIZANDO; // Fuerzas el aterrizaje automático
+      estadoDron = ATERRIZANDO; 
     }
   }
 
@@ -244,7 +250,6 @@ void loop() {
   if (dt >= 0.01) { // 100Hz
     tiempoAnterior = tiempoActual;
 
-    // LEER SENSOR RAW I2C
     Wire.beginTransmission(MPU_ADDR);
     Wire.write(0x3B);
     Wire.endTransmission(false);
@@ -264,7 +269,6 @@ void loop() {
     pitchReal = 0.98 * (pitchReal + gyroXrate * dt) + 0.02 * accPitch;
     rollReal  = 0.98 * (rollReal  + gyroYrate * dt) + 0.02 * accRoll;
 
-    // MÁQUINA DE ESTADOS
     if (estadoDron == DESPEGANDO) {
       pwmBase += VELOCIDAD_RAMPA;
       if (pwmBase >= PWM_HOVER) { pwmBase = PWM_HOVER; estadoDron = VOLANDO; }
@@ -283,7 +287,6 @@ void loop() {
       
       int t_pwm   = map(throttleManual, -100, 100, -200, 200); 
 
-      // PID PITCH
       errorPitch = pitchTarget - pitchReal;
       sumErrorPitch += errorPitch * dt;
       sumErrorPitch = constrain(sumErrorPitch, -50, 50); 
@@ -291,7 +294,6 @@ void loop() {
       float pidPitch = (Kp * errorPitch) + (Ki * sumErrorPitch) + (Kd * dErrorPitch);
       errorPitchPrev = errorPitch;
 
-      // PID ROLL
       errorRoll = rollTarget - rollReal;
       sumErrorRoll += errorRoll * dt;
       sumErrorRoll = constrain(sumErrorRoll, -50, 50); 
@@ -299,7 +301,6 @@ void loop() {
       float pidRoll = (Kp * errorRoll) + (Ki * sumErrorRoll) + (Kd * dErrorRoll);
       errorRollPrev = errorRoll;
 
-      // PID YAW
       errorYaw = yawTarget - yawRate; 
       sumErrorYaw += errorYaw * dt;
       sumErrorYaw = constrain(sumErrorYaw, -50, 50);
@@ -307,15 +308,13 @@ void loop() {
       float pidYaw = (Kp_yaw * errorYaw) + (Ki_yaw * sumErrorYaw) + (Kd_yaw * dErrorYaw);
       errorYawPrev = errorYaw;
 
-      // CORRECCIÓN: MEZCLA DE MOTORES (Yaw con signos corregidos para CCW/CW pares diagonales)
       int base = pwmBase + t_pwm;
 
-      pwmFinalM1 = base + pidPitch - pidRoll + pidYaw; // M1 (CCW) -> Suma
-      pwmFinalM2 = base - pidPitch - pidRoll - pidYaw; // M2 (CW)  -> Resta
-      pwmFinalM3 = base + pidPitch + pidRoll - pidYaw; // M3 (CW)  -> Resta
-      pwmFinalM4 = base - pidPitch + pidRoll + pidYaw; // M4 (CCW) -> Suma
+      pwmFinalM1 = base + pidPitch - pidRoll + pidYaw;
+      pwmFinalM2 = base - pidPitch - pidRoll - pidYaw;
+      pwmFinalM3 = base + pidPitch + pidRoll - pidYaw;
+      pwmFinalM4 = base - pidPitch + pidRoll + pidYaw;
 
-      // Restringimos los valores a los límites físicos del ESC
       pwmFinalM1 = constrain(pwmFinalM1, MIN_PULSE, MAX_PULSE);
       pwmFinalM2 = constrain(pwmFinalM2, MIN_PULSE, MAX_PULSE);
       pwmFinalM3 = constrain(pwmFinalM3, MIN_PULSE, MAX_PULSE);
@@ -325,7 +324,6 @@ void loop() {
       pwmBase = MIN_PULSE;
     }
 
-    // MANDAR SEÑAL A ESCs
     esc1.writeMicroseconds(pwmFinalM1);
     esc2.writeMicroseconds(pwmFinalM2);
     esc3.writeMicroseconds(pwmFinalM3);
